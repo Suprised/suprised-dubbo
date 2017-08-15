@@ -10,11 +10,13 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="hello-world-app"  />
     
-    <!-- 全局参数配置 -->
+    <!-- 服务提供者全局参数配置 -->
     <dubbo:provider timeout="3000" retries="3" />
  
+ 	<!-- 支持多协议/多注册中心 -->
+ 	
     <!-- 使用multicast广播注册中心暴露服务地址 -->
-    <dubbo:registry address="multicast://224.5.6.7:1234" />
+    <dubbo:registry id="multicastRegister" address="multicast://224.5.6.7:1234" register="true" subscribe="true"/> <!-- 可以支持只订阅/只注册服务（方便开发时使用） -->
     <!--<dubbo:registry address="zookeeper://192.168.1.109:2181"/>-->
  
     <!-- 用dubbo协议在20880端口暴露服务 -->
@@ -25,11 +27,16 @@
 		    message 只有请求响应消息派发到线程池，其它连接断开事件，心跳等消息，直接在IO线程上执行。
 		    execution 只请求消息派发到线程池，不含响应，响应和其它连接断开事件，心跳等消息，直接在IO线程上执行。
 		    connection 在IO线程上，将连接断开事件放入队列，有序逐个执行，其它消息派发到线程池。
+		    
+		ThreadPool
+			fixed 固定大小线程池，启动时建立线程，不关闭，一直持有。(缺省)
+			cached 缓存线程池，空闲一分钟自动删除，需要时重建。
+			limited 可伸缩线程池，但池中的线程数只会增长不会收缩。(为避免收缩时突然来了大流量引起的性能问题)。
      -->
-    <dubbo:protocol name="dubbo" port="20880"  dispatcher="direct"/>
+    <dubbo:protocol id="dubbo" name="dubbo" port="20880" threads="10" threadpool="fixed" queues="200" dispatcher="message"/>
  
     <!-- 声明需要暴露的服务接口 -->
-    <dubbo:service interface="com.suprised.dubbo.helloworld.HelloworldService" ref="helloworldService" />
+    <dubbo:service interface="com.suprised.dubbo.helloworld.HelloworldService" ref="helloworldService" registry="multicastRegister"/>
  
     <!-- 和本地bean一样实现服务 -->
     <bean id="helloworldService" class="com.suprised.dubbo.helloworld.impl.HelloworldServiceImpl" />
