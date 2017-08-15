@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans        
+    http://www.springframework.org/schema/beans/spring-beans.xsd        
+    http://code.alibabatech.com/schema/dubbo        
+    classpath:/dubbo.xsd">
+ 
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="hello-world-app"  />
+    
+    <!-- 全局参数配置 -->
+    <dubbo:provider timeout="3000" retries="3" />
+ 
+    <!-- 使用multicast广播注册中心暴露服务地址 -->
+    <dubbo:registry address="multicast://224.5.6.7:1234" />
+    <!--<dubbo:registry address="zookeeper://192.168.1.109:2181"/>-->
+ 
+    <!-- 用dubbo协议在20880端口暴露服务 -->
+    <!-- 
+    	Dispatcher
+		    all 所有消息都派发到线程池，包括请求，响应，连接事件，断开事件，心跳等。
+		    direct 所有消息都不派发到线程池，全部在IO线程上直接执行。
+		    message 只有请求响应消息派发到线程池，其它连接断开事件，心跳等消息，直接在IO线程上执行。
+		    execution 只请求消息派发到线程池，不含响应，响应和其它连接断开事件，心跳等消息，直接在IO线程上执行。
+		    connection 在IO线程上，将连接断开事件放入队列，有序逐个执行，其它消息派发到线程池。
+     -->
+    <dubbo:protocol name="dubbo" port="20880"  dispatcher="direct"/>
+ 
+    <!-- 声明需要暴露的服务接口 -->
+    <dubbo:service interface="com.suprised.dubbo.helloworld.HelloworldService" ref="helloworldService" />
+ 
+    <!-- 和本地bean一样实现服务 -->
+    <bean id="helloworldService" class="com.suprised.dubbo.helloworld.impl.HelloworldServiceImpl" />
+ 
+    <!-- 扫描注解包路径，多个包用逗号分隔，不填pacakge表示扫描当前ApplicationContext中所有的类 -->
+    <dubbo:annotation package="com.suprised.dubbo" />
+</beans>
