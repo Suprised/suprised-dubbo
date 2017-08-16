@@ -11,7 +11,7 @@
     <dubbo:application name="hello-world-app"  />
     
     <!-- 服务提供者全局参数配置 -->
-    <dubbo:provider timeout="3000" retries="3" />
+    <dubbo:provider timeout="30000" retries="3" />
  
  	<!-- 支持多协议/多注册中心 -->
  	
@@ -33,7 +33,7 @@
 			cached 缓存线程池，空闲一分钟自动删除，需要时重建。
 			limited 可伸缩线程池，但池中的线程数只会增长不会收缩。(为避免收缩时突然来了大流量引起的性能问题)。
      -->
-    <dubbo:protocol id="dubbo" name="dubbo" port="20880" threads="10" threadpool="fixed" queues="200" dispatcher="message"/>
+    <dubbo:protocol id="dubbo" name="dubbo" port="20880" threads="100" threadpool="fixed" queues="200" dispatcher="message"/>
  
     <!-- 声明需要暴露的服务接口 -->
     <dubbo:service interface="com.suprised.dubbo.helloworld.HelloworldService" ref="helloworldService" registry="multicastRegister"/>
