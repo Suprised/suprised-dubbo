@@ -24,13 +24,13 @@ public class WindowsGoupImpl implements ServerGroup {
     @Override
     public String limitAccess()  throws LimitException{
         // System.out.println(Thread.currentThread().getName() + "-windows可用的许可：" + semaphore.drainPermits());
+        boolean acquire = false;
         try {
             // semaphore.acquire();// 获取许可
-            if (semaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
+            acquire = semaphore.tryAcquire(100, TimeUnit.MILLISECONDS); // 100ms内尝试获取许可
+            if (acquire) {
                 atomicLong.incrementAndGet();
                 Thread.sleep(150);// 执行三秒
-                semaphore.release();//释放许可
-                atomicLong.decrementAndGet();
             } else {
                 System.out.println("print: 当前访问人数过多，请稍后再试!");
                 throw new LimitException("当前访问人数过多，请稍后再试!");
@@ -38,6 +38,10 @@ public class WindowsGoupImpl implements ServerGroup {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
+            if (acquire) {
+                semaphore.release();//释放许可
+                atomicLong.decrementAndGet();
+            }
         }
         return "windows执行人数：   " + atomicLong.get();
     }
