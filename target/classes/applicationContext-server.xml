@@ -35,11 +35,31 @@
      -->
     <dubbo:protocol id="dubbo" name="dubbo" port="20880" threads="100" threadpool="fixed" queues="200" dispatcher="message"/>
  
+ 	<!-- 和本地bean一样实现服务 -->
+    <bean id="helloworldService" class="com.suprised.dubbo.helloworld.impl.HelloworldServiceImpl" />
+    
     <!-- 声明需要暴露的服务接口 -->
     <dubbo:service interface="com.suprised.dubbo.helloworld.HelloworldService" ref="helloworldService" registry="multicastRegister"/>
  
-    <!-- 和本地bean一样实现服务 -->
-    <bean id="helloworldService" class="com.suprised.dubbo.helloworld.impl.HelloworldServiceImpl" />
+ 	<!-- 回调客户端的接口实现 -->
+ 	<bean id="callbackService" class="com.suprised.dubbo.callback.impl.CallbackServiceImpl" />
+ 	<dubbo:service interface="com.suprised.dubbo.callback.CallbackService" ref="callbackService" registry="multicastRegister" connections="10" callbacks="1000">
+ 		<dubbo:method name="addListener">
+ 			<!-- 指定回调哪个参数 -->
+ 			<dubbo:argument index="1" callback="true"/>
+ 			<!-- 可以指定类型 -->
+ 			<!-- <dubbo:argument type="com.suprised.dubbo.callback.CallbackListener" callback="true"/> -->
+ 		</dubbo:method>
+ 	</dubbo:service>
+ 	
+ 	<!-- 服务端事件通知： 目前好像不支持？ -->
+ 	<bean id="serviceEvent" class="com.suprised.dubbo.event.impl.ServiceEventImpl" />
+ 	<!-- 事件服务 -->
+ 	<bean id="eventService" class="com.suprised.dubbo.event.impl.EventServiceImpl" />
+ 	<dubbo:service interface="com.suprised.dubbo.event.EventService" ref="eventService" registry="multicastRegister">
+ 		<dubbo:method name="invoca" onreturn="serviceEvent.onreturn" onthrow="serviceEvent.onthrow" />
+ 		<dubbo:method name="invocaThrowException" onreturn="serviceEvent.onreturn" onthrow="serviceEvent.onthrow" />
+ 	</dubbo:service>
  
     <!-- 扫描注解包路径，多个包用逗号分隔，不填pacakge表示扫描当前ApplicationContext中所有的类 -->
     <dubbo:annotation package="com.suprised.dubbo" />
