@@ -60,6 +60,16 @@
  		<dubbo:method name="invoca" onreturn="serviceEvent.onreturn" onthrow="serviceEvent.onthrow" />
  		<dubbo:method name="invocaThrowException" onreturn="serviceEvent.onreturn" onthrow="serviceEvent.onthrow" />
  	</dubbo:service>
+ 	
+ 	<!-- 本地代码存根 -->
+ 	<bean id="stubService" class="com.suprised.dubbo.stub.impl.StubServiceImpl" />
+ 	<!-- stub="com.suprised.dubbo.stub.StubServiceStub" -->
+ 	<dubbo:service interface="com.suprised.dubbo.stub.StubService" ref="stubService" registry="multicastRegister" stub="com.suprised.dubbo.stub.StubServiceStub"/>
+ 	
+ 	<!-- 本地伪装 -->
+ 	<bean id="mockService" class="com.suprised.dubbo.mock.impl.MockServiceImpl"/>
+ 	<!-- mock="com.suprised.dubbo.mock.MockServiceMock" -->
+ 	<dubbo:service interface="com.suprised.dubbo.mock.MockService" ref="mockService" registry="multicastRegister" mock="com.suprised.dubbo.mock.MockServiceMock"/>
  
     <!-- 扫描注解包路径，多个包用逗号分隔，不填pacakge表示扫描当前ApplicationContext中所有的类 -->
     <dubbo:annotation package="com.suprised.dubbo" />
