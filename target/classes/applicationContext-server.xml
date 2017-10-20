@@ -10,8 +10,10 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="hello-world-app"  />
     
+    <!-- <dubbo:protocol server="netty4"/> -->
+    
     <!-- 服务提供者全局参数配置 -->
-    <dubbo:provider timeout="30000" retries="3" />
+    <dubbo:provider timeout="30000" retries="3"/>
  
  	<!-- 支持多协议/多注册中心 -->
  	
