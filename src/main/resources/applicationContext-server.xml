@@ -13,7 +13,9 @@
     <!-- <dubbo:protocol server="netty4"/> -->
     
     <!-- 服务提供者全局参数配置 -->
-    <dubbo:provider timeout="30000" retries="3"/>
+    <!-- 连接控制 -->
+    <!-- 限制客户端服务使⽤连接不能超过 100 个  connections="100" 可以单独为每个服务指定-->
+    <dubbo:provider timeout="30000" retries="3" />
  
  	<!-- 支持多协议/多注册中心 -->
  	
@@ -35,13 +37,16 @@
 			cached 缓存线程池，空闲一分钟自动删除，需要时重建。
 			limited 可伸缩线程池，但池中的线程数只会增长不会收缩。(为避免收缩时突然来了大流量引起的性能问题)。
      -->
+     
     <dubbo:protocol id="dubbo" name="dubbo" port="20880" threads="100" threadpool="fixed" queues="200" dispatcher="message"/>
  
  	<!-- 和本地bean一样实现服务 -->
     <bean id="helloworldService" class="com.suprised.dubbo.helloworld.impl.HelloworldServiceImpl" />
     
     <!-- 声明需要暴露的服务接口 -->
-    <dubbo:service interface="com.suprised.dubbo.helloworld.HelloworldService" ref="helloworldService" registry="multicastRegister"/>
+    <!-- 如果你的服务需要预热时间，⽐如初始化缓存，等待相关资源就位等，可以使⽤ delay 进⾏延迟暴露。 -->
+    <!-- 延迟5s暴漏 -->
+    <dubbo:service delay="5000" interface="com.suprised.dubbo.helloworld.HelloworldService" ref="helloworldService" registry="multicastRegister"/>
  
  	<!-- 回调客户端的接口实现 -->
  	<bean id="callbackService" class="com.suprised.dubbo.callback.impl.CallbackServiceImpl" />
@@ -57,10 +62,13 @@
  	<!-- 服务端事件通知： 目前好像不支持？ -->
  	<bean id="serviceEvent" class="com.suprised.dubbo.event.impl.ServiceEventImpl" />
  	<!-- 事件服务 -->
- 	<bean id="eventService" class="com.suprised.dubbo.event.impl.EventServiceImpl" />
+ 	<bean id="eventService" class="com.suprised.dubbo.event.impl.EventServiceImpl"/>
+ 	<!-- 并发限制 -->
+ 	<!-- 限制 服务 的每个⽅法，服务器端并发执⾏（或占⽤线程池线程数）不能超过 10 个  executes="10"-->
+ 	<!-- 限制  com.foo.BarService  的每个⽅法，每客户端并发执⾏（或占⽤连接的请求数）不能超过 10 个   actives="10"-->
  	<dubbo:service interface="com.suprised.dubbo.event.EventService" ref="eventService" registry="multicastRegister">
  		<dubbo:method name="invoca" onreturn="serviceEvent.onreturn" onthrow="serviceEvent.onthrow" />
- 		<dubbo:method name="invocaThrowException" onreturn="serviceEvent.onreturn" onthrow="serviceEvent.onthrow" />
+ 		<dubbo:method name="invocaThrowException" onreturn="serviceEvent.onreturn" onthrow="serviceEvent.onthrow"/>
  	</dubbo:service>
  	
  	<!-- 本地代码存根 -->
